@@ -61,6 +61,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          semantic_version: 25.0.3
+          branches: ["master", "feature/**"]
           extra_plugins: |
             @semantic-release/exec
             conventional-changelog-conventionalcommits
