@@ -1,0 +1,24 @@
+name: oc-new-p6-ci
+run-name: ${{ github.actor }} a lancé le workflow CI/CD pour le projet oc-new-p6
+
+on:
+  push:
+    branches: [ "main", "master", "feature/**", "hotfix/**" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+    test:
+      name: exécute le script de tests unitaires sur toutes les applications
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Run tests
+          run: chmod +x run-tests.sh && ./run-tests.sh
+        - name: Upload test results
+          uses: actions/upload-artifact@v4
+          with:
+            name: test-results
+            path: test-results/
+        
