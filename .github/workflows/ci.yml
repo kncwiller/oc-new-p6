@@ -59,8 +59,6 @@ jobs:
         run: |
           # Remplace les '/' par des '-' dans le nom de la branche
           echo "SAFE_BRANCH=${GITHUB_REF_NAME//\//-}" >> $GITHUB_ENV
-          # Met le propriétaire du repo en minuscules (Docker n'accepte pas de majuscules)
-          echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
 
       - name: Build and push backend image
         uses: docker/build-push-action@v6
@@ -68,7 +66,7 @@ jobs:
           context: ./workshop-organizer
           file: ./workshop-organizer/Dockerfile
           push: true
-          tags: ghcr.io/${{ env.OWNER_LC }}/workshop-organizer:${{ env.SAFE_BRANCH }}-${{ github.sha }}
+          tags: ghcr.io/workshop-organizer:${{ env.SAFE_BRANCH }}-${{ github.sha }}
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
@@ -76,5 +74,5 @@ jobs:
           context: ./oc-p6-front
           file: ./oc-p6-front/Dockerfile
           push: true
-          tags: ghcr.io/${{ env.OWNER_LC }}/olympic-game-starter:${{ env.SAFE_BRANCH }}-${{ github.sha }}
+          tags: ghcr.io/olympic-game-starter:${{ env.SAFE_BRANCH }}-${{ github.sha }}
 
