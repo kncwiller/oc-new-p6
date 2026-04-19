@@ -1,0 +1,14 @@
+services:
+  olympic-game:
+    build: .
+    image: olympic-game-starter:latest
+    container_name: olympic-game-starter
+    networks:
+      - default
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: olympic-game-network

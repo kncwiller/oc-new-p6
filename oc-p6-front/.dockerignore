@@ -1,0 +1,8 @@
+dist
+.vscode/*
+.anhular/*
+k8s
+reports
+node_modules
+npm-debug.log
+yarn-error.log

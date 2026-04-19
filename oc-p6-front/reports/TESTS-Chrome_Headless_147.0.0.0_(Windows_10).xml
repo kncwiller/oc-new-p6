@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome Headless 147.0.0.0 (Windows 10)" package="" timestamp="2026-04-19T08:25:29" id="0" hostname="LAPTOP-01LPHMTB" tests="5" errors="0" failures="0" time="0.072">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.0.0 Safari/537.36"/>
+  </properties>
+  <testcase name="AppComponent should have as title 'olympic-games-starter'" time="0.051" classname="Chrome_Headless_147_0_0_0_(Windows_10).AppComponent"/>
+  <testcase name="AppComponent should create the app" time="0.002" classname="Chrome_Headless_147_0_0_0_(Windows_10).AppComponent"/>
+  <testcase name="HomeComponent should create" time="0.011" classname="Chrome_Headless_147_0_0_0_(Windows_10).HomeComponent"/>
+  <testcase name="OlympicService should be created" time="0.002" classname="Chrome_Headless_147_0_0_0_(Windows_10).OlympicService"/>
+  <testcase name="NotFoundComponent should create" time="0.006" classname="Chrome_Headless_147_0_0_0_(Windows_10).NotFoundComponent"/>
+  <system-out>
+    <![CDATA[
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>
