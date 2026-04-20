@@ -37,85 +37,36 @@ jobs:
           files: "test-results/*.xml"
 
   release:
-    name: Create release
+    name: Create releases
     runs-on: ubuntu-latest
-    needs: test
+    # needs: test
     # if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
       issues: write
       pull-requests: write
-    # On exporte les résultats pour que le job 'build' puisse les lire
-    outputs:
-      published: ${{ steps.semantic.outputs.new_release_published }}
-      version: ${{ steps.semantic.outputs.new_release_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Semantic Release
-        id: semantic
-        uses: cycjimmy/semantic-release-action@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install semantic release dependencies
+        working-directory: ./workshop-organizer
+        run: npm ci
+
+      - name: Semantic Release Backend
+        id: release_back
+        working-directory: ./workshop-organizer
+        run: |
+          chmod +x ./scripts/update-version.sh
+          npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          semantic_version: 25.0.3
-          branches: ["master", "feature/**"]
-          extra_plugins: |
-            @semantic-release/exec
-            conventional-changelog-conventionalcommits
-
-  build:
-    name: Build & Publish Docker images
-    runs-on: ubuntu-latest
-    needs: [test, release]
-    # On exécute 'build' si 'test' réussit ET si 'release' réussit ou est ignoré (sur les feature branches)
-    if: always() && needs.test.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped')
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Prepare Docker tag variables
-        run: |
-          # Si le job release a publié une nouvelle version, on l'utilise (ex: 1.2.3)
-          if [ "${{ needs.release.outputs.published }}" == "true" ]; then
-            echo "DOCKER_TAG=${{ needs.release.outputs.version }}" >> $GITHUB_ENV
-          else
-            # Sinon, on utilise le nom de la branche et le SHA du commit
-            SAFE_BRANCH=${GITHUB_REF_NAME//\//-}
-            echo "DOCKER_TAG=${SAFE_BRANCH}-${GITHUB_SHA}" >> $GITHUB_ENV
-          fi
-          # Obligatoire pour GHCR : le nom d'utilisateur en minuscules
-          echo "OWNER_LC=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
-
-      - name: Build and push backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./workshop-organizer
-          file: ./workshop-organizer/Dockerfile
-          push: true
-          tags: ghcr.io/${{ env.OWNER_LC }}/workshop-organizer:${{ env.DOCKER_TAG }}
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./oc-p6-front
-          file: ./oc-p6-front/Dockerfile
-          push: true
-          tags: ghcr.io/${{ env.OWNER_LC }}/olympic-game-starter:${{ env.DOCKER_TAG }}
+          GIT_AUTHOR_NAME: "github-actions[bot]"
 

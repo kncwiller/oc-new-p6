@@ -84,10 +84,10 @@ publishing {
     repositories {
 		maven {
 			url "https://gitlab.com/api/v4/projects/$System.env.GITLAB_PROJECT_ID/packages/maven"
-			name "GitLab"
+			name = "GitHubPackages"
 			credentials(HttpHeaderCredentials) {
-				name = System.getenv("GITLAB_TOKEN_NAME")
-				value = System.getenv("GITLAB_TOKEN")
+				name = System.getenv("GITHUB_ACTOR")
+				value = System.getenv("GITHUB_TOKEN")
 			}
 			authentication {
 				header(HttpHeaderAuthentication)
