@@ -39,8 +39,8 @@ jobs:
   release:
     name: Create releases
     runs-on: ubuntu-latest
-    # needs: test
-    # if: github.ref == 'refs/heads/main'
+    needs: test
+    if: github.ref == 'refs/heads/master'
     permissions:
       contents: write
       issues: write
@@ -59,7 +59,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install semantic release dependencies
         working-directory: ./workshop-organizer
@@ -90,8 +90,8 @@ jobs:
   build:
     name: Build & Publish Docker images
     runs-on: ubuntu-latest
-    needs: [release]
-    if: always() # && needs.test.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped')
+    needs: [test, release]
+    if: github.ref == 'refs/heads/master' && needs.test.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped')
     permissions:
       contents: read
       packages: write
