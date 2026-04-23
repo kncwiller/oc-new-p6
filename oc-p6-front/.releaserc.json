@@ -1,0 +1,59 @@
+{
+    "branches": [
+        "master",
+        "feature/cicd"
+    ],
+    "tagFormat": "v${version}",
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/changelog",
+            {
+                "changelogFile": "CHANGELOG.md"
+            }
+        ],
+        [
+            "@semantic-release/npm",
+            {
+                "npmPublish": false
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "prepareCmd": "echo 'Building Angular app v${nextRelease.version}' && npm run build --configuration production",
+                "publishCmd": "cd dist && zip -r olympic-games-starter-${nextRelease.version}.zip . && echo 'Archive créée'"
+            }
+        ],
+        [
+            "@semantic-release/git",
+            {
+                "assets": [
+                    "CHANGELOG.md",
+                    "package.json",
+                    "package-lock.json"
+                ],
+                "message": "chore(release): v${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+            }
+        ],
+        [
+            "@semantic-release/github",
+            {
+                "assets": [
+                    {
+                        "path": "olympic-games-starter-*.zip",
+                        "label": "Build dist (${nextRelease.gitTag})"
+                    }
+                ],
+                "successComment": "🎉 Cette PR est incluse dans la version [${nextRelease.version}](${releases[0].url}) !",
+                "labels": [
+                    "released"
+                ],
+                "releasedLabels": [
+                    "released@${nextRelease.channel}"
+                ]
+            }
+        ]
+    ]
+}
