@@ -6,6 +6,8 @@
 # Définition des chemins
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RESULTS_DIR="$SCRIPT_DIR/test-results"
+TESTS_FAILED=0
+
 
 echo "========================================"
 echo "Préparation de l'environnement de test"
@@ -43,7 +45,10 @@ for dir in "$SCRIPT_DIR"/*/; do
             echo "-> Ajout des droits d'exécution au script Gradle..."
             chmod +x ./gradlew
             echo "-> Lancement des tests avec Gradle..."
-            ./gradlew clean test
+            if ! ./gradlew clean test; then
+                echo "   /!\ Les tests Gradle ont échoué."
+                TESTS_FAILED=1
+            fi
             echo "-> Récupération des rapports JUnit XML..."
             
             # Gradle place les rapports dans build/test-results/test/
@@ -63,7 +68,10 @@ for dir in "$SCRIPT_DIR"/*/; do
             npm ci || npm install
             
             echo "-> Lancement des tests avec NPM..."
-            npm run test
+            if ! npm run test; then
+                echo "   /!\ Les tests NPM ont échoué."
+                TESTS_FAILED=1
+            fi
             
             echo "-> Récupération des rapports JUnit XML..."
             # Karma/Jest est généralement configuré pour placer les rapports dans reports/ ou coverage/
@@ -88,6 +96,14 @@ done
 
 echo ""
 echo "========================================"
-echo "Les tests ont été exécutés."
 echo "Les rapports JUnit XML consolidés sont disponibles dans : $RESULTS_DIR"
-echo "========================================"
+
+if [ $TESTS_FAILED -ne 0 ]; then
+    echo "Attention : Certains tests ont échoué !"
+    echo "========================================"
+    exit 1
+else
+    echo "Tous les tests ont été exécutés avec succès !"
+    echo "========================================"
+    exit 0
+fi
